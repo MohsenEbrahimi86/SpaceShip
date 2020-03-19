@@ -7,7 +7,9 @@ import pygame
 pygame.init()
 
 # create the screen
-screen = pygame.display.set_mode((800, 600))
+width = 800
+height = 600
+screen = pygame.display.set_mode((width, height))
 
 # Caption and Icon
 pygame.display.set_caption("War in the space")
@@ -69,8 +71,15 @@ def game_over_text():
     screen.blit(over_text, (200, 250))
 
 
-def player(x, y):
-    screen.blit(playerImg, (x, y))
+class Player:
+    def __init__(self, sprite=None, x=0, y=0):
+        self.x = x
+        self.y = y
+        self.sprite = sprite
+
+
+player_sprite = pygame.image.load('human.png')
+player = Player(player_sprite, int(width / 2), height)
 
 
 def enemy(x, y, i):
@@ -78,8 +87,6 @@ def enemy(x, y, i):
 
 
 def fire_bullet(x, y):
-    global bullet_state
-    bullet_state = "fire"
     screen.blit(bulletImg, (x + 16, y + 10))
 
 
@@ -94,9 +101,8 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
 # Game Loop
 running = True
 while running:
-
     # RGB = Red, Green, Blue
-    screen.fill((255, 255, 255)
+    screen.fill((255, 255, 255))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -109,11 +115,12 @@ while running:
                 playerX_change = 5
             if event.key == pygame.K_SPACE:
                 if bullet_state is "ready":
-                    bulletSound = mixer.Sound("laser.wav")
-                    bulletSound.play()
+                    # bulletSound = pygame.mixer.Sound("laser.wav")
+                    # bulletSound.play()
                     # Get the current x cordinate of the spaceship
                     bulletX = playerX
-                    fire_bullet(bulletX, bulletY)
+                    bullet_state = 'fire'
+                    # fire_bullet(bulletX, bulletY)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -149,8 +156,8 @@ while running:
         # Collision
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
         if collision:
-            #explosionSound = mixer.Sound("explosion.wav")
-           # explosionSound.play()
+            # explosionSound = mixer.Sound("explosion.wav")
+            # explosionSound.play()
             bulletY = 480
             bullet_state = "ready"
             score_value += 1
@@ -168,6 +175,6 @@ while running:
         fire_bullet(bulletX, bulletY)
         bulletY -= bulletY_change
 
-    player(playerX, playerY)
+    screen.blit(player.sprite, (player.x, player.y))
     show_score(textX, testY)
     pygame.display.update()
